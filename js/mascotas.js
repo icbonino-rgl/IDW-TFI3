@@ -1,15 +1,15 @@
-const formMascota = document.getElementById('formMascota');
+const formularioMascota = document.getElementById('formularioMascota');
 const tablaMascotas = document.getElementById('tablaMascotas');
 const totalMascotas = document.getElementById('totalMascotas');
-const btnCancelar = document.getElementById('btnCancelar');
+const botonCancelar = document.getElementById('botonCancelar');
 
 // Leer datos de LocalStorage
-function getMascotas() {
+function obtenerMascotas() {
     return JSON.parse(localStorage.getItem('mascotas')) || [];
 }
 
 // Guardar datos en LocalStorage
-function saveMascotas(mascotas) {
+function guardarMascotas(mascotas) {
     localStorage.setItem('mascotas', JSON.stringify(mascotas));
 }
 
@@ -19,8 +19,8 @@ function generarId() {
 }
 
 // Renderizar la tabla
-function renderizarTabla() {
-    const mascotas = getMascotas();
+function actualizarTabla() {
+    const mascotas = obtenerMascotas();
     tablaMascotas.innerHTML = '';
     totalMascotas.textContent = mascotas.length;
 
@@ -42,12 +42,12 @@ function renderizarTabla() {
 }
 
 // Procesar Formulario (Alta y Modificación)
-formMascota.addEventListener('submit', function(e) {
+formularioMascota.addEventListener('submit', function(e) {
     e.preventDefault();
-    const mascotas = getMascotas();
+    const mascotas = obtenerMascotas();
     
     // Capturar datos y transformarlos en objeto
-    const mascotaData = {
+    const datosMascota = {
         idMascota: document.getElementById('idMascota').value || generarId(),
         nombreMascota: document.getElementById('nombreMascota').value,
         nombreDuenio: document.getElementById('nombreDuenio').value,
@@ -60,33 +60,33 @@ formMascota.addEventListener('submit', function(e) {
 
     if (idActual) {
         // Modificación
-        const index = mascotas.findIndex(m => m.idMascota === idActual);
-        mascotas[index] = mascotaData;
+        const indice = mascotas.findIndex(m => m.idMascota === idActual);
+        mascotas[indice] = datosMascota;
     } else {
         // Alta
-        mascotas.push(mascotaData);
+        mascotas.push(datosMascota);
     }
 
-    saveMascotas(mascotas);
-    formMascota.reset();
+    guardarMascotas(mascotas);
+    formularioMascota.reset();
     document.getElementById('idMascota').value = '';
-    btnCancelar.classList.add('d-none');
-    renderizarTabla();
+    botonCancelar.classList.add('d-none');
+    actualizarTabla();
 });
 
 // Eliminar Mascota
 function eliminarMascota(id) {
     if(confirm("¿Está seguro que desea eliminar esta mascota?")) { // Previa confirmación
-        let mascotas = getMascotas();
+        let mascotas = obtenerMascotas();
         mascotas = mascotas.filter(m => m.idMascota !== id);
-        saveMascotas(mascotas);
-        renderizarTabla();
+        guardarMascotas(mascotas);
+        actualizarTabla();
     }
 }
 
 // Cargar datos al formulario para editar
 function editarMascota(id) {
-    const mascotas = getMascotas();
+    const mascotas = obtenerMascotas();
     const mascota = mascotas.find(m => m.idMascota === id);
     
     document.getElementById('idMascota').value = mascota.idMascota;
@@ -96,15 +96,15 @@ function editarMascota(id) {
     document.getElementById('edad').value = mascota.edad;
     document.getElementById('peso').value = mascota.peso;
 
-    btnCancelar.classList.remove('d-none');
+    botonCancelar.classList.remove('d-none');
 }
 
 // Cancelar edición
-btnCancelar.addEventListener('click', () => {
-    formMascota.reset();
+botonCancelar.addEventListener('click', () => {
+    formularioMascota.reset();
     document.getElementById('idMascota').value = '';
-    btnCancelar.classList.add('d-none');
+    botonCancelar.classList.add('d-none');
 });
 
 // Cargar tabla al iniciar
-document.addEventListener('DOMContentLoaded', renderizarTabla);
+document.addEventListener('DOMContentLoaded', actualizarTabla);

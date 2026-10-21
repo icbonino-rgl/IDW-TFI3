@@ -1,14 +1,14 @@
-const formVeterinario = document.getElementById('formVeterinario');
+const formularioVeterinario = document.getElementById('formularioVeterinario');
 const tablaVeterinarios = document.getElementById('tablaVeterinarios');
-const btnCancelarVet = document.getElementById('btnCancelarVet');
+const botonCancelarVeterinario = document.getElementById('botonCancelarVeterinario');
 
 // Leer datos de LocalStorage
-function getVeterinarios() {
+function obtenerVeterinarios() {
     return JSON.parse(localStorage.getItem('veterinarios')) || [];
 }
 
 // Guardar datos en LocalStorage
-function saveVeterinarios(veterinarios) {
+function guardarVeterinarios(veterinarios) {
     localStorage.setItem('veterinarios', JSON.stringify(veterinarios));
 }
 
@@ -24,8 +24,8 @@ const formateadorMoneda = new Intl.NumberFormat('es-AR', {
 });
 
 // Renderizar la tabla
-function renderizarTablaVet() {
-    const veterinarios = getVeterinarios();
+function actualizarTablaVeterinarios() {
+    const veterinarios = obtenerVeterinarios();
     tablaVeterinarios.innerHTML = '';
 
     veterinarios.forEach(vet => {
@@ -45,12 +45,12 @@ function renderizarTablaVet() {
 }
 
 // Procesar Formulario (Alta y Modificación)
-formVeterinario.addEventListener('submit', function(e) {
+formularioVeterinario.addEventListener('submit', function(e) {
     e.preventDefault();
-    const veterinarios = getVeterinarios();
+    const veterinarios = obtenerVeterinarios();
     
     // Capturar datos y transformarlos en objeto
-    const vetData = {
+    const datosVeterinario = {
         idVeterinario: document.getElementById('idVeterinario').value || generarId(),
         matricula: parseInt(document.getElementById('matricula').value),
         nombre: document.getElementById('nombre').value,
@@ -62,33 +62,33 @@ formVeterinario.addEventListener('submit', function(e) {
 
     if (idActual) {
         // Modificación
-        const index = veterinarios.findIndex(v => v.idVeterinario === idActual);
-        veterinarios[index] = vetData;
+        const indice = veterinarios.findIndex(v => v.idVeterinario === idActual);
+        veterinarios[indice] = datosVeterinario;
     } else {
         // Alta
-        veterinarios.push(vetData);
+        veterinarios.push(datosVeterinario);
     }
 
-    saveVeterinarios(veterinarios);
-    formVeterinario.reset();
+    guardarVeterinarios(veterinarios);
+    formularioVeterinario.reset();
     document.getElementById('idVeterinario').value = '';
-    btnCancelarVet.classList.add('d-none');
-    renderizarTablaVet();
+    botonCancelarVeterinario.classList.add('d-none');
+    actualizarTablaVeterinarios();
 });
 
 // Eliminar Veterinario
 function eliminarVeterinario(id) {
     if(confirm("¿Está seguro que desea eliminar este veterinario?")) { // Previa confirmación
-        let veterinarios = getVeterinarios();
+        let veterinarios = obtenerVeterinarios();
         veterinarios = veterinarios.filter(v => v.idVeterinario !== id);
-        saveVeterinarios(veterinarios);
-        renderizarTablaVet();
+        guardarVeterinarios(veterinarios);
+        actualizarTablaVeterinarios();
     }
 }
 
 // Cargar datos al formulario para editar
 function editarVeterinario(id) {
-    const veterinarios = getVeterinarios();
+    const veterinarios = obtenerVeterinarios();
     const vet = veterinarios.find(v => v.idVeterinario === id);
     
     document.getElementById('idVeterinario').value = vet.idVeterinario;
@@ -97,15 +97,15 @@ function editarVeterinario(id) {
     document.getElementById('especializacion').value = vet.especializacion;
     document.getElementById('valorConsulta').value = vet.valorConsulta;
 
-    btnCancelarVet.classList.remove('d-none');
+    botonCancelarVeterinario.classList.remove('d-none');
 }
 
 // Cancelar edición
-btnCancelarVet.addEventListener('click', () => {
-    formVeterinario.reset();
+botonCancelarVeterinario.addEventListener('click', () => {
+    formularioVeterinario.reset();
     document.getElementById('idVeterinario').value = '';
-    btnCancelarVet.classList.add('d-none');
+    botonCancelarVeterinario.classList.add('d-none');
 });
 
 // Cargar tabla al iniciar
-document.addEventListener('DOMContentLoaded', renderizarTablaVet);
+document.addEventListener('DOMContentLoaded', actualizarTablaVeterinarios);
